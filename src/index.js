@@ -10,7 +10,7 @@ dbConnect()
         console.log("app started at port ", process.env.PORT)
     })
 })
-.catch((err) => {
+.catch((err) => {   
     console.log("Port err", err)
 })
 
