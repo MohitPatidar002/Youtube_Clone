@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../middlewares/multer.middleware.js');
 
-const registerUser = require('../controllers/user.controller.js');
-const loginUser = require('../controllers/login.js');
-const logoutUser = require('../controllers/user.controller.js');
+const registerUser = require('../controllers/register.controller.js');
+const loginUser = require('../controllers/login.controller.js');
+const logoutUser = require('../controllers/logout.controller.js');
 const verifyJWT = require('../middlewares/auth.middleware.js');
+const refreshAccessToken = require('../controllers/refreshToken.controller.js');
 
 router.route('/register').post(
     upload.fields([
@@ -24,5 +25,6 @@ router.route('/login').post(loginUser);
 
 //secure routes
 router.route('/logout').post(verifyJWT, logoutUser);
+router.route('/refresh-token').post(refreshAccessToken)
 
 module.exports = router;
