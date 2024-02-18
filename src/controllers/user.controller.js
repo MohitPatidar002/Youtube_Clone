@@ -1,8 +1,30 @@
-const asyncHandler = require('../utils/asyncHandler');
+const asyncHandler = require('../utils/asyncHandler.js');
 const ApiError = require('../utils/ApiError.js');
 const User = require('../models/user.model.js');
 const uploadOnCloudinary = require('../utils/fileUpload.js')
 const ApiResponse = require('../utils/ApiResponse.js');
+
+// generate refresh and access token
+// const generateAccessAndRefreshToken = async(userId) => {
+//     try{
+//         // find user and generate the tokens
+//         const user = await User.findById(userId)
+//         const accessToken = user.generateAccessToken();
+//         const refreshToken = user.generateRefreshToken();
+
+//         // put refresh token into db and save
+//         user.refreshToken = refreshToken
+//         await user.save({ validateBeforSave: false})
+
+
+//         // return access and refresh token
+//         return {accessToken, refreshToken}
+//     }
+//     catch(error){
+//         throw new ApiError(500, "Something went wrong while generating Access and Refresh Token")
+//     }
+// }
+
 
 const registerUser = asyncHandler( async (req, res) => {
     // get the user detail from frontend
@@ -18,7 +40,7 @@ const registerUser = asyncHandler( async (req, res) => {
     // check the all field fillup correctly
     if(
         [username, fullName, email, password].some((field) => 
-        field?.trim() === "")
+        field?.trim === "")
     ){
         throw new ApiError(400, 'All fields are required')
     }
@@ -85,4 +107,37 @@ const registerUser = asyncHandler( async (req, res) => {
     )
 })
 
+
+
+
+
+
+
+// Logout
+const logoutUser = asyncHandler(async(req, res) => {
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                refreshToken: undefined
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "user logged out successfully"))
+})
+
 module.exports = registerUser;
+module.exports = logoutUser;
